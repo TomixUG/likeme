@@ -1,26 +1,26 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
-import { ObjectType, Field, ID, Root } from "type-graphql";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  BaseEntity,
+  OneToMany,
+} from "typeorm";
+import { RefreshToken } from "./RefreshToken";
 
-@ObjectType()
 @Entity("users")
 export class User extends BaseEntity {
-  @Field(() => ID)
-  @PrimaryGeneratedColumn('uuid')
-  id: number;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-  @Field()
   @Column("text", { unique: true })
   username: string;
 
-  @Field()
   @Column("text", { unique: true })
   email: string;
 
   @Column("text")
   password: string;
 
-  // @Field()
-  // customNonDb(@Root() parent: User): string{
-  //     return "Hello";
-  // }
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+  refreshTokens: RefreshToken[];
 }

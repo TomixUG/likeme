@@ -1,20 +1,18 @@
-import { Resolver, Query, Mutation, Arg } from "type-graphql";
+import { Resolver, Mutation, Arg, Ctx } from "type-graphql";
 import { hash } from "bcryptjs";
 import { User } from "../../entity/User";
 import { RegisterInput } from "./register/RegisterInput";
+import { LoginResponse } from "./login/LoginResponse";
+import { createAccessToken, createRefreshToken } from "../../util/auth";
+import { MyContext } from "../../types/MyContext";
 
 @Resolver()
 export class RegisterResolver {
-
-  @Query(() => [User])
-  async users() {
-    return User.find();
-  }
-
-  @Mutation(() => User)
+  @Mutation(() => LoginResponse)
   async register(
-    @Arg("data") { username, email, password }: RegisterInput
-  ): Promise<User> {
+    @Arg("data") { username, email, password }: RegisterInput,
+    @Ctx() { req, res }: MyContext
+  ): Promise<LoginResponse|any> {
     const hashedPassword = await hash(password, 12);
 
     const user = await User.create({
@@ -25,6 +23,9 @@ export class RegisterResolver {
 
     console.log(user);
 
-    return user;
+    return {
+      accessToken: createAccessToken(user.id),
+      refreshToken: createRefreshToken(user.id, req.ip),
+    };
   }
 }

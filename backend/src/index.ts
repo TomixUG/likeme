@@ -1,24 +1,20 @@
 import "dotenv/config";
 import "reflect-metadata";
 import { createConnection } from "typeorm";
-
 import { ApolloServer } from "apollo-server-express";
 import {
   ApolloServerPluginLandingPageGraphQLPlayground,
   ApolloServerPluginLandingPageDisabled,
 } from "apollo-server-core";
 import * as express from "express";
-import { buildSchema } from "type-graphql";
-import { RegisterResolver } from "./modules/user/Register";
-import { LoginResolver } from "./modules/user/Login";
-import { UserInfoResolver } from "./modules/user/UserInfo";
+import { createSchema } from "./util/createSchema";
+
 
 async function main() {
   await createConnection();
 
-  const schema = await buildSchema({
-    resolvers: [RegisterResolver, LoginResolver, UserInfoResolver],
-  });
+  const schema = await createSchema();
+
   const server = new ApolloServer({
     schema,
     plugins: [

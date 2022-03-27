@@ -1,15 +1,31 @@
-import { Ctx, Query, Resolver, UseMiddleware } from "type-graphql";
+import { Ctx, Field, ObjectType, Query, Resolver, UseMiddleware } from "type-graphql";
 import { User } from "../../entity/User";
 import { MyContext } from "../../types/MyContext";
 import { isAuth } from "../../util/isAuthMiddleware";
 
+@ObjectType()
+class UInfo {
+  @Field()
+  id: string;
+
+  @Field()
+  username: string;
+
+  @Field()
+  email: string;
+}
+
 @Resolver()
 export class UserInfoResolver {
-  @Query(() => String)
+  @Query(() => UInfo)
   @UseMiddleware(isAuth)
-  async userInfo(@Ctx() { payload }: MyContext): Promise<String> {
-    // const user = await User.findOne({ where: { payload.userId } });
+  async userInfo(@Ctx() { payload }: MyContext): Promise<UInfo> {
+    const user = await User.findOne({ where: { id: payload.userId } });
 
-    return payload.userId;
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+    };
   }
 }
