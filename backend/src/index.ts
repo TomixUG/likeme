@@ -30,8 +30,8 @@ async function main() {
 
   server.applyMiddleware({ app });
 
-  app.listen({ port: 4000 }, () => {
-    console.log("Server listening at http://localhost:4000/graphql");
+  app.listen({ port: process.env.PORT! }, () => {
+    console.log(`Server listening at http://localhost:${process.env.PORT!}/graphql`);
   });
 }
 
